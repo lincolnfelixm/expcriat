@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <script src="../js/hash.js"></script>
+    <script defer src="../js/login.js"></script>
+  </head>
+  <body>
+    <h1>Login</h1>
+    <form id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required><br>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required><br>
+
+      <button type="button" onclick="login()">Login</button>
+    </form>
+    <p><a href="recovery.html">Forgot your password?</a></p>
+    <p><a href="signup.html">Create a account.</a></p>
+  </body>
+</html>
