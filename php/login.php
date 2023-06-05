@@ -2,11 +2,23 @@
     include 'conn.php';
     include 'session.php'; 
 
-    $login = $_POST["username"];
-    $passwd = $_POST["password"];
+    $encryptedLogin = $_POST["username"];
+    $encryptedPassword = $_POST["password"];
 
-    $query = "SELECT username, password FROM users WHERE username = '$login' AND password = '$passwd'";
-    $result = $conn->query($query);
+    // Read the private key from a file
+    $privateKey = file_get_contents('private_key.pem');
+
+    $privateKeyResource = openssl_pkey_get_private($privateKey);
+
+    // Decrypt the username and password
+    openssl_private_decrypt($encryptedLogin, $decryptedLogin, $privateKeyResource);
+    openssl_private_decrypt($encryptedPassword, $decryptedPassword, $privateKeyResource);
+
+    // Using Prepared Statements to prevent SQL Injection
+    $stmt = $conn->prepare("SELECT username, password FROM users WHERE username = ? AND password = ?");
+    $stmt->bind_param("ss", $decryptedLogin, $decryptedPassword);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         // Login successful

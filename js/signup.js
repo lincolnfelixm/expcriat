@@ -1,4 +1,4 @@
-function validateForm() {
+async function validateForm() {
   const username = document.getElementById('username').value;
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
@@ -35,10 +35,26 @@ function validateForm() {
     return false;
   }
 
-  const hashedPassword = CryptoJS.SHA256(password).toString();
+  // Fetch the public key from the server
+  const publicKeyResponse = await fetch('public_key.pem');
+  const publicKey = await publicKeyResponse.text();
+
+  const encrypt = new JSEncrypt();
+  encrypt.setPublicKey(publicKey);
+
+  // Encrypt all data
+  const encryptedUsername = encrypt.encrypt(username);
+  const encryptedEmail = encrypt.encrypt(email);
+  const encryptedPassword = encrypt.encrypt(password);
+  const encryptedCpf = encrypt.encrypt(cpf);
+  const encryptedPhone = encrypt.encrypt(phone);
 
   const formData = new FormData(document.getElementById('signup-form'));
-  formData.set('password', hashedPassword);
+  formData.set('username', encryptedUsername);
+  formData.set('email', encryptedEmail);
+  formData.set('password', encryptedPassword);
+  formData.set('cpf', encryptedCpf);
+  formData.set('phone', encryptedPhone);
 
   fetch('../php/signup.php', {
     method: 'POST',
